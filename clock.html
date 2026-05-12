@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KKJ Timepiece</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #f0d080;
+      --gold-dim: #7a6330;
+      --deep: #0a0a0f;
+      --face: #0f0f1a;
+      --rim: #1a1a2e;
+      --text: #e8d8a0;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--deep);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% 0%, #1a1020 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 50% 100%, #0d1520 0%, transparent 70%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Subtle starfield */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 15% 20%, rgba(255,255,220,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 72% 8%, rgba(255,255,220,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 88% 55%, rgba(255,255,220,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 80%, rgba(255,255,220,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 90%, rgba(255,255,220,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 5% 65%, rgba(255,255,220,0.2) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 45% 35%, rgba(255,255,220,0.15) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Heading */
+    .heading {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.1rem, 3vw, 1.8rem);
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+      animation: fadeDown 1.4s ease both;
+      text-shadow: 0 0 40px rgba(201,168,76,0.5), 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .heading-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+      font-style: italic;
+      color: var(--gold-dim);
+      letter-spacing: 0.5em;
+      text-align: center;
+      margin-bottom: 48px;
+      position: relative;
+      z-index: 1;
+      animation: fadeDown 1.6s ease both;
+    }
+
+    /* Outer glow ring */
+    .clock-wrapper {
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 1.8s ease both;
+    }
+
+    .clock-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: -18px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0%, var(--gold-dim) 10%, var(--gold) 20%, var(--gold-dim) 30%,
+        transparent 40%, var(--gold-dim) 55%, var(--gold) 65%, var(--gold-dim) 75%,
+        transparent 85%, var(--gold-dim) 95%, transparent 100%
+      );
+      animation: rotateSlow 18s linear infinite;
+      opacity: 0.6;
+    }
+
+    .clock-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: -14px;
+      border-radius: 50%;
+      background: var(--deep);
+    }
+
+    /* Main clock */
+    .clock {
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #1c1c30 0%, #0f0f1a 55%, #080810 100%);
+      border: 3px solid var(--gold-dim);
+      box-shadow:
+        0 0 0 6px rgba(201,168,76,0.08),
+        0 0 60px rgba(201,168,76,0.15),
+        inset 0 0 60px rgba(0,0,0,0.8),
+        inset 0 0 20px rgba(201,168,76,0.04);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Tick marks */
+    .clock::before {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.15);
+    }
+
+    /* Numbers */
+    .clock .number {
+      --rotation: 0deg;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transform: rotate(var(--rotation));
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: var(--gold);
+      text-shadow: 0 0 12px rgba(201,168,76,0.6);
+      user-select: none;
+    }
+
+    .clock .number span {
+      display: inline-block;
+      margin-top: 14px;
+      transform: rotate(calc(-1 * var(--rotation)));
+    }
+
+    .clock .number1  { --rotation: 30deg; }
+    .clock .number2  { --rotation: 60deg; }
+    .clock .number3  { --rotation: 90deg; }
+    .clock .number4  { --rotation: 120deg; }
+    .clock .number5  { --rotation: 150deg; }
+    .clock .number6  { --rotation: 180deg; }
+    .clock .number7  { --rotation: 210deg; }
+    .clock .number8  { --rotation: 240deg; }
+    .clock .number9  { --rotation: 270deg; }
+    .clock .number10 { --rotation: 300deg; }
+    .clock .number11 { --rotation: 330deg; }
+
+    /* Hands */
+    .clock .hand {
+      --rotation: 0;
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+      transform: translateX(-50%) rotate(calc(var(--rotation) * 1deg));
+      border-radius: 6px 6px 3px 3px;
+      z-index: 10;
+    }
+
+    .clock .hand.hour {
+      width: 6px;
+      height: 26%;
+      background: linear-gradient(to top, var(--gold), var(--gold-light));
+      box-shadow: 0 0 10px rgba(201,168,76,0.7);
+      border-radius: 4px 4px 2px 2px;
+      bottom: calc(50% - 8px);
+    }
+
+    .clock .hand.minute {
+      width: 4px;
+      height: 36%;
+      background: linear-gradient(to top, var(--gold-dim), var(--gold));
+      box-shadow: 0 0 8px rgba(201,168,76,0.5);
+      bottom: calc(50% - 8px);
+    }
+
+    .clock .hand.second {
+      width: 2px;
+      height: 40%;
+      background: linear-gradient(to top, #ff6060, #ff2020);
+      box-shadow: 0 0 8px rgba(255,60,60,0.8);
+      bottom: calc(50% - 14px);
+    }
+
+    /* Center jewel */
+    .clock::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: radial-gradient(circle at 40% 35%, #fff8e0, var(--gold) 60%, var(--gold-dim));
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 12;
+      box-shadow: 0 0 12px rgba(201,168,76,0.9), 0 0 4px rgba(255,255,255,0.4);
+    }
+
+    /* Digital time display */
+    .digital {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      text-align: center;
+      margin-top: 4px;
+      position: absolute;
+      width: 100%;
+      top: 66%;
+      z-index: 10;
+      text-shadow: 0 0 10px rgba(201,168,76,0.3);
+      user-select: none;
+    }
+
+    /* Signature */
+    .signature {
+      margin-top: 42px;
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      animation: fadeUp 2.2s ease both;
+    }
+
+    .signature-line {
+      width: 180px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+      margin: 0 auto 12px;
+    }
+
+    .signature-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.8rem;
+      font-style: italic;
+      color: var(--gold-dim);
+      letter-spacing: 0.18em;
+    }
+
+    .signature-name {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      margin-top: 4px;
+      text-shadow: 0 0 20px rgba(201,168,76,0.4);
+    }
+
+    .signature-ornament {
+      font-size: 1.2rem;
+      color: var(--gold-dim);
+      letter-spacing: 0.5em;
+      margin-top: 6px;
+      opacity: 0.6;
+    }
+
+    /* Animations */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rotateSlow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="heading">The Timepiece</h1>
+  <p class="heading-sub">precision &nbsp;·&nbsp; elegance &nbsp;·&nbsp; time</p>
+
+  <div class="clock-wrapper">
+    <div class="clock">
+      <div class="hand hour"   data-hour-hand></div>
+      <div class="hand minute" data-minute-hand></div>
+      <div class="hand second" data-second-hand></div>
+
+      <div class="number number1"><span>I</span></div>
+      <div class="number number2"><span>II</span></div>
+      <div class="number number3"><span>III</span></div>
+      <div class="number number4"><span>IV</span></div>
+      <div class="number number5"><span>V</span></div>
+      <div class="number number6"><span>VI</span></div>
+      <div class="number number7"><span>VII</span></div>
+      <div class="number number8"><span>VIII</span></div>
+      <div class="number number9"><span>IX</span></div>
+      <div class="number number10"><span>X</span></div>
+      <div class="number number11"><span>XI</span></div>
+      <div class="number number12" style="--rotation:0deg"><span>XII</span></div>
+
+      <div class="digital" id="digital-time"></div>
+    </div>
+  </div>
+
+  <div class="signature">
+    <div class="signature-line"></div>
+    <div class="signature-text">crafted with precision by</div>
+    <div class="signature-name">Krishna Kumar Jha</div>
+    <div class="signature-ornament">✦ ✦ ✦</div>
+  </div>
+
+  <script>
+    const hourHand   = document.querySelector('[data-hour-hand]')
+    const minuteHand = document.querySelector('[data-minute-hand]')
+    const secondHand = document.querySelector('[data-second-hand]')
+    const digitalEl  = document.getElementById('digital-time')
+
+    function setClock() {
+      const now = new Date()
+      const sec  = now.getSeconds()
+      const min  = now.getMinutes()
+      const hr   = now.getHours()
+
+      const secondsRatio = sec / 60
+      const minutesRatio = (secondsRatio + min) / 60
+      const hoursRatio   = (minutesRatio + hr) / 12
+
+      setRotation(secondHand, secondsRatio)
+      setRotation(minuteHand, minutesRatio)
+      setRotation(hourHand,   hoursRatio)
+
+      // Digital readout
+      const hh = String(hr).padStart(2, '0')
+      const mm = String(min).padStart(2, '0')
+      const ss = String(sec).padStart(2, '0')
+      digitalEl.textContent = `${hh} : ${mm} : ${ss}`
+    }
+
+    function setRotation(el, ratio) {
+      el.style.setProperty('--rotation', ratio * 360)
+    }
+
+    setClock()
+    setInterval(setClock, 1000)
+  </script>
+</body>
+</html>
