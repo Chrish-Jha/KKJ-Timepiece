@@ -16,7 +16,7 @@
 <br/>
 
 <!-- Replace the path below with your actual screenshot after uploading to GitHub -->
-<img src="./screenshot.png" alt="KKJ Timepiece Preview" width="480" style="border-radius: 12px;" />
+<img src="./screenshot1.png" alt="KKJ Timepiece Preview" width="480" style="border-radius: 12px;" />
 
 <br/><br/>
 
